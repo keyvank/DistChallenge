@@ -9,3 +9,7 @@ challenge_3a:
 challenge_3b:
 	go build -C ./challenge-3b/ -o dist-challenge
 	maelstrom test -w broadcast --bin ./challenge-3b/dist-challenge --node-count 5 --time-limit 20 --rate 10
+
+challenge_3c:
+	go build -C ./challenge-3c/ -o dist-challenge
+	maelstrom test -w broadcast --bin ./challenge-3c/dist-challenge --node-count 5 --time-limit 20 --rate 10 --nemesis partition
