@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	maelstrom "github.com/jepsen-io/maelstrom/demo/go"
@@ -27,18 +28,17 @@ func getNode() *maelstrom.Node {
 		if err := json.Unmarshal(msg.Body, &body); err != nil {
 			return err
 		}
+		fmt.Fprintln(os.Stderr, "broadcast called")
 		message := int(body["message"].(float64))
 		if !contain(message, messages) {
 			messages = append(messages, message)
-			broadcast(neighbours, message, n)
+			result := broadcast(neighbours, message, n)
+			fmt.Fprintln(os.Stderr, "broadcast result, ", result)
 		}
-		resp := map[string]any{
+		reply := map[string]any{
 			"type": "broadcast_ok",
 		}
-		for err := n.Reply(msg, resp); err == nil; {
-			continue
-		}
-		return nil
+		return n.Reply(msg, reply)
 	})
 
 	n.Handle("read", func(msg maelstrom.Message) error {
@@ -76,24 +76,24 @@ func broadcast(neighbours []string, message int, n *maelstrom.Node) error {
 			"type":    "broadcast",
 			"message": message,
 		}
-		sucessful := false
-		for !sucessful {
-			bacgroundCtx := context.Background()
-			ctx, err := context.WithTimeout(bacgroundCtx, time.Second*5)
-			if err != nil {
-				return fmt.Errorf(">>>>> context error")
+		go func(nodeId string) {
+			success := false
+			for !success {
+				ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*2)
+				defer cancelFunc()
+				resp, err := n.SyncRPC(ctx, nodeId, body)
+				if err != nil {
+					errCode := resp.RPCError().Code
+					if errCode == 0 || errCode == 13 {
+						fmt.Fprintln(os.Stderr, "f to send message ", message, "to node ", nodeId)
+					}
+					time.Sleep(time.Second)
+					continue
+				}
+				fmt.Fprintln(os.Stderr, "s to send message ", message, "to node ", nodeId)
+				success = true
 			}
-			resp, timeoutErr := n.SyncRPC(ctx, nodeId, body)
-			if timeoutErr != nil {
-				return fmt.Errorf(">>>>> timeout error")
-			}
-			errCode := resp.RPCError().Code
-			if errCode == 0 || errCode == 13 {
-				return fmt.Errorf(">>>>> timeout error")
-			} else {
-				return fmt.Errorf(">>>>> timeout error: %v", errCode)
-			}
-		}
+		}(nodeId)
 	}
 	return nil
 }
