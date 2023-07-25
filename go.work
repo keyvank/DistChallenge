@@ -1,0 +1,8 @@
+go 1.20
+
+use (
+	./challenge-2
+	./challenge-3a
+	./challenge-3b
+	./challenge-3c
+)
