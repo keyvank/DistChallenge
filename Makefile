@@ -17,3 +17,4 @@ challenge_3c:
 challenge_3d:
 	go build -C ./challenge-3d/ -o dist-challenge
 	maelstrom test -w broadcast --bin ./challenge-3d/dist-challenge --node-count 25 --time-limit 20 --rate 100 --latency 100
+
