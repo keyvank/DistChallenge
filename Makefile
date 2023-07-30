@@ -26,3 +26,8 @@ challenge_3d-partition:
 challenge_4:
 	go build -C ./challenge-4/ -o dist-challenge
 	maelstrom test -w g-counter --bin ./challenge-4/dist-challenge --node-count 3 --rate 100 --time-limit 20 --nemesis partition
+
+
+challenge_4-dec:
+	go build -C ./challenge-4/ -o dist-challenge
+	maelstrom test -w pn-counter --bin ./challenge-4/dist-challenge --node-count 3 --rate 100 --time-limit 20 --nemesis partition
