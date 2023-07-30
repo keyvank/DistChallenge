@@ -5,4 +5,5 @@ use (
 	./challenge-3a
 	./challenge-3b
 	./challenge-3c
+	./challenge-3d
 )

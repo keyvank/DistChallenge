@@ -13,3 +13,14 @@ challenge_3b:
 challenge_3c:
 	go build -C ./challenge-3c/ -o dist-challenge
 	maelstrom test -w broadcast --bin ./challenge-3c/dist-challenge --node-count 5 --time-limit 20 --rate 10 --nemesis partition
+
+challenge_3d-latency:
+	go build -C ./challenge-3d/ -o dist-challenge
+	maelstrom test -w broadcast --bin ./challenge-3d/dist-challenge --node-count 25 --time-limit 20 --rate 100 --latency 100
+
+
+challenge_3d-partition:
+	go build -C ./challenge-3d/ -o dist-challenge
+	maelstrom test -w broadcast --bin ./challenge-3d/dist-challenge --node-count 25 --time-limit 20 --rate 100 --nemesis partition
+
+
